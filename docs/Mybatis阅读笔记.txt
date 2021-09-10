@@ -8,8 +8,8 @@ Mybatis阅读笔记：
 
 6.SqlSession实现BATCH批量操作，必须和Spring的事务结合起来才可以，否则会出现每一次执行都会新建sqlSession的情况，极大降低效率！！！、】
 
-7.可以使用TransactionTemplate.execute手动触发事务，但是貌似这个手动触发的批量，耗时很长，暂时还没有去研究为啥。
-TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+7.可以使用TransactionTemplate.execute手动触发事务，但是貌似这个手动触发的批量，耗时很长，暂时还没有去研究为啥(研究出来了，触发的时长是正常的，前面测试的慢是因为我没有提交事务)。
+``` TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 transactionTemplate.execute(txStatus -> {
 
     for (int i = 0; i < 100000; i++) {
@@ -21,6 +21,8 @@ transactionTemplate.execute(txStatus -> {
     }
     return null;
 });
+```
+
 需要传入一个transactionManager，作为事务的执行器。
 
 8. 使用MapperScan自动扫描并注入的Mapper对象，实际上是使用动态代理生成的代理对象，
@@ -29,3 +31,5 @@ transactionTemplate.execute(txStatus -> {
     当然也可以使用手动的方式去注入，sqlsession.getMapper的方式，使用指定的SqlSessionTemplate手动生成代理对象。   
 
 9.Mybatis使用同一个sqlSession的时候，如果执行的语句完全一样，会有相应的结果缓存。 Spring在默认非事务的情况下，mybatis会在每一个执行的mapper方法的时候去获取一个新的sqlsession。但是如果在事务处理环境中，则会使用同一个sqlSession对象。
+    一级缓存 基于sqlsession，同一个sqlsession，默认开启缓存。
+    二级缓存
